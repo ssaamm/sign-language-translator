@@ -15,7 +15,7 @@
         var start_time = new Date().getTime()/1000;
         var asl_interval = setInterval(function() {
           $.get('/current', '', function(data, textStatus, jqXHR) {
-            if (data.new) {
+            if (data.count === 3) {
               var goal = $('#prompt').attr('class');
               if (data['symbol'] == goal) {
                 var ndx = Math.floor(Math.random() * chars.length);
