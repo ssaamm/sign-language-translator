@@ -14,6 +14,8 @@ controller.set_policy(Leap.Controller.POLICY_BACKGROUND_FRAMES)
 past_symbol = 'a'
 prev_prediction = None
 
+prediction_count = 0
+
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 @app.route('/translate')
@@ -45,7 +47,7 @@ def get_scores():
 def current_symbol():
     global past_symbol
     global prev_prediction
-
+    global prediction_count
     # Is there a hand?
     hand_pos = get_hand_position(controller)
     if not hand_pos:
@@ -57,11 +59,12 @@ def current_symbol():
     # Do we have a new symbol?
     prediction = ''.join(clf.predict(features))
     if prediction == prev_prediction:
-        # We good fam
-        return jsonify(new=False, symbol=prediction)
+        prediction_count += 1
+        return jsonify(new=False, count=prediction_count, symbol=prediction)
     else:
         prev_prediction = prediction
-        return jsonify(new=True, symbol=prediction)
+        prediction_count = 0
+        return jsonify(new=True, count=prediction_count, symbol=prediction)
 
 @app.route('/splash')
 def splash():
